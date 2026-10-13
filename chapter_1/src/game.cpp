@@ -1,5 +1,5 @@
 #include "game.h"
-#include "stdio.h"
+#include <cmath>
 
 Game::Game(){
     p_Window = nullptr;
@@ -132,9 +132,12 @@ void Game::UpdateGame(){
         ballVel.x *= -1;
     }
     //check if ball touch the paddle
-    bool sameXasPaddle = (ballPos.x <= (paddlePos.x+thickness/2)&&(ballVel.x<0.0f));
-    bool betweenYPaddle = (ballPos.y >= (paddlePos.y-paddleH/2))&&(ballPos.y <= (paddlePos.y + paddleH/2));
-    if(sameXasPaddle && betweenYPaddle){
+    float yDiff = std::abs(ballPos.y - paddlePos.y);
+    bool betweenPaddle = yDiff <= paddleH / 2.0f;
+
+    bool collideOnX = (ballPos.x <= (paddlePos.x + thickness/2)+(thickness/2))&&(ballPos.x >= 5-(paddlePos.x + thickness/2)+(thickness/2));
+    
+    if(betweenPaddle &&collideOnX&&ballVel.x < 0.0f){
         ballVel.x *= -1;
     }
 
