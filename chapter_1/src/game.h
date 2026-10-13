@@ -3,6 +3,13 @@
 
 #include <SDL.h>
 
+struct Vector2
+    {
+        float x;
+        float y;
+    };
+
+
 
 class Game {
     public:
@@ -19,8 +26,18 @@ class Game {
         void GenerateOutput();
 
         SDL_Window* p_Window;
+        SDL_Renderer* p_Renderer;
 
         bool isRunning;
+        const int thickness = 15;
+        Vector2 paddlePos;
+        int8_t paddleDir;
+        uint16_t paddleH;
+
+        Vector2 ballPos;
+        Vector2 ballVel;
+
+        Uint32 ticksCounts;
 
 
 };
