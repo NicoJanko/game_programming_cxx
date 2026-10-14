@@ -6,15 +6,29 @@ Game::Game(){
 
     isRunning = true;
 
-    paddlePos.x = 0;
-    paddlePos.y = 768/2;
-    paddleDir = 0;
+    paddle1.position.x = 0;
+    paddle1.position.y = 768/2;
+    paddle1.direction = 0;
+    paddle1.height = 10*thickness;
 
-    ballPos.x = 1024/2;
-    ballPos.y = 768/2;
+    paddle2.position.x = 1024;
+    paddle2.position.y = 768/2;
+    paddle2.direction = 0;
+    paddle2.height = 10*thickness;
 
-    ballVel.x = -200;
-    ballVel.y = 235;
+
+    Ball ball1{
+        {1024/2,768/2},
+        {200,235}
+    };
+    Ball ball2{
+        {1024/2,768/2},
+        {-200,-235}
+    };
+
+    ballVector.push_back(ball1);
+    ballVector.push_back(ball2);
+
 
     ticksCounts = 0;
 
@@ -88,12 +102,12 @@ void Game::ProcessInput(){
 
     //process direction
     state = SDL_GetKeyboardState(NULL);
-    paddleDir = 0;
+    paddle1.direction = 0;
     if(state[SDL_SCANCODE_W]){
-        paddleDir = -1;
+        paddle1.direction = -1;
     }
     if(state[SDL_SCANCODE_S]){
-        paddleDir = 1;
+        paddle1.direction = 1;
     } 
 }
 
@@ -101,45 +115,57 @@ void Game::UpdateGame(){
 
     while(!SDL_TICKS_PASSED(SDL_GetTicks(),ticksCounts+16));
     //determine delta time
-    float deltaTime = (SDL_GetTicks()-ticksCounts);
+    deltaTime = (SDL_GetTicks()-ticksCounts);
     ticksCounts = SDL_GetTicks();
     if(deltaTime > 0.05f){
         deltaTime = 0.05f;
     }
     //update paddle position
-    if (paddleDir !=0){
-        paddlePos.y += paddleDir*300.0f*deltaTime;
-        if(paddlePos.y < (paddleH/2.0f + thickness)){
-            paddlePos.y = (paddleH/2.0f + thickness);
-        } else if(paddlePos.y > ((768.0f-paddleH/2.0f) + thickness)) {
-                paddlePos.y = ((768.0f-paddleH/2.0f) + thickness);
+    if (paddle1.direction !=0){
+        paddle1.position.y += paddle1.direction*300.0f*deltaTime;
+        if(paddle1.position.y < (paddle1.height/2.0f + thickness)){
+            paddle1.position.y = (paddle1.height/2.0f + thickness);
+        } else if(paddle1.position.y > ((768.0f-paddle1.height/2.0f) + thickness)) {
+                paddle1.position.y = ((768.0f-paddle1.height/2.0f) + thickness);
+        }
+    }
+    //check closest ball
+    int32_t previousDist = 1024;
+    for(int i = 0; i<ballVector.size();i++){
+        int32_t Xdist = paddle2.position.x - ballVector.at(i).postion.x;
+        if(Xdist<previousDist){
+            closetBall = i;
+            previousDist = Xdist;
+        }
+    }
+    //check if the ball is up ro down from the paddle
+    paddle2.direction =0;
+    if(ballVector.at(closetBall).postion.y - (paddle2.position.y - paddle2.height)<0){
+        paddle2.direction = -1; // go up
+    }
+    if(ballVector.at(closetBall).postion.y - (paddle2.position.y + paddle2.height)>0){
+        paddle2.direction = 1;
+    }
+
+    //update second paddle position automatically 
+    if (paddle2.direction !=0){
+        paddle2.position.y += paddle2.direction*300.0f*deltaTime;
+        if(paddle2.position.y < (paddle2.height/2.0f + thickness)){
+            paddle2.position.y = (paddle2.height/2.0f + thickness);
+        } else if(paddle2.position.y > ((768.0f-paddle2.height/2.0f) + thickness)) {
+                paddle2.position.y = ((768.0f-paddle2.height/2.0f) + thickness);
         }
     }
 
     //update ball position
-    ballPos.x += ballVel.x * deltaTime;
-    ballPos.y += ballVel.y * deltaTime;
-    //check if ball touch the top wall
-    if ((ballPos.y <= thickness)&&(ballVel.y < 0.0f)) {
-        ballVel.y *= -1;
-    }
-    //check if ball touch the bottom wall
-    if((ballPos.y >= 768-thickness)&&(ballVel.y>0.0f)){
-        ballVel.y *= -1;
-    }
-    //check if ball touch the right wall
-    if((ballPos.x >= 1024-thickness)&&(ballVel.x >0.0f)){
-        ballVel.x *= -1;
-    }
     //check if ball touch the paddle
-    float yDiff = std::abs(ballPos.y - paddlePos.y);
-    bool betweenPaddle = yDiff <= paddleH / 2.0f;
-
-    bool collideOnX = (ballPos.x <= (paddlePos.x + thickness/2)+(thickness/2))&&(ballPos.x >= 5-(paddlePos.x + thickness/2)+(thickness/2));
-    
-    if(betweenPaddle &&collideOnX&&ballVel.x < 0.0f){
-        ballVel.x *= -1;
+    for(auto& thisBall: ballVector){
+        updateBallPos(thisBall);
+        checkBallPaddleColision(thisBall, paddle1);
+        checkBallPaddleColision(thisBall, paddle2);
     }
+    
+    
 
 }
 
@@ -182,34 +208,36 @@ void Game::GenerateOutput(){
         thickness
     };
     SDL_RenderFillRect(p_Renderer, &b_wall);
-    //rightwall
     
-    SDL_Rect r_wall{
-        1024-thickness,
-        0,
-        thickness,
-        768
-    };
-    SDL_RenderFillRect(p_Renderer, &r_wall);
-
 
     //ball
-    SDL_Rect ball{
-        static_cast<int>(ballPos.x - thickness/2),
-        static_cast<int>(ballPos.y - thickness/2),
+    for(auto& thisBall: ballVector){
+        SDL_Rect ball{
+        static_cast<int>(thisBall.postion.x - thickness/2),
+        static_cast<int>(thisBall.postion.y - thickness/2),
         thickness,
         thickness
     };
     SDL_RenderFillRect(p_Renderer, &ball);
-    //ball
-    paddleH = 10*thickness;
-    SDL_Rect paddle{
-        static_cast<int>(paddlePos.x - thickness/2),
-        static_cast<int>(paddlePos.y - paddleH/2),
+    }
+    
+    //paddle1
+    
+    SDL_Rect paddleRect1{
+        static_cast<int>(paddle1.position.x - thickness/2),
+        static_cast<int>(paddle1.position.y - paddle1.height/2),
         thickness,
-        paddleH
+        paddle1.height
     };
-    SDL_RenderFillRect(p_Renderer, &paddle);
+    SDL_RenderFillRect(p_Renderer, &paddleRect1);
+    //paddle2
+    SDL_Rect paddleRect2{
+        static_cast<int>(paddle2.position.x - thickness/2),
+        static_cast<int>(paddle2.position.y - paddle2.height/2),
+        thickness,
+        paddle2.height
+    };
+    SDL_RenderFillRect(p_Renderer, &paddleRect2);
 
 
 
@@ -220,3 +248,31 @@ void Game::GenerateOutput(){
     return;
 }
 
+
+void Game::updateBallPos(Ball& ball){
+    //update ball position
+    ball.postion.x += ball.velocity.x * deltaTime;
+    ball.postion.y += ball.velocity.y * deltaTime;
+    //check if ball touch the top wall
+    if ((ball.postion.y <= thickness)&&(ball.velocity.y < 0.0f)) {
+        ball.velocity.y *= -1;
+    }
+    //check if ball touch the bottom wall
+    if((ball.postion.y >= 768-thickness)&&(ball.velocity.y>0.0f)){
+        ball.velocity.y *= -1;
+    }
+    
+}
+
+void Game::checkBallPaddleColision(Ball& ball,const Paddle& paddle){
+    float yDiff = std::abs(ball.postion.y - paddle.position.y);
+    bool betweenPaddle = yDiff <= paddle.height / 2.0f;
+
+    bool collideOnX = std::abs(ball.postion.x - paddle.position.x) <= thickness;
+
+    bool movingToward = (paddle.position.x - ball.postion.x) * ball.velocity.x > 0.0f;
+    
+    if(betweenPaddle &&collideOnX&&movingToward){
+        ball.velocity.x *= -1;
+    }
+}
