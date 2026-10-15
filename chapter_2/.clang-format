@@ -1,0 +1,4 @@
+BasedOnStyle: LLVM        # or Google, Microsoft, Mozilla...
+IndentWidth: 4
+ColumnLimit: 100
+PointerAlignment: Left    # int* p, not int *p
