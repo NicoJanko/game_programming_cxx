@@ -33,6 +33,7 @@ add_executable(starship src/main.cpp
     src/object/vectors.h
     src/components/component.h
     src/components/component.cpp
+    src/utils.h
     )
 target_include_directories(starship PRIVATE src)
 target_link_libraries(

@@ -11,13 +11,15 @@ class Actor {
     Actor(class Game* game);
     virtual ~Actor();
 
-    void update(float deltaTime);
-    void updateComponents(float deltaTime);
+    void update(const float& deltaTime);
+    void updateComponents(const float& deltaTime);
 
-    virtual void updateActor(float deltaTime);
+    virtual void updateActor(const float& deltaTime);
 
     void addComponent(class Component* component);
     void removeComponent(class Component* component);
+
+    State getState();
 
   private:
     State state;
