@@ -3,6 +3,8 @@
 
 #include "actors/actor.h"
 #include <SDL.h>
+#include <SDL_image.h>
+#include <unordered_map>
 #include <vector>
 
 class Game {
@@ -26,12 +28,15 @@ class Game {
     bool updatingActor;
     std::vector<Actor*> activeActors;
     std::vector<Actor*> pendingActors;
+    void loadData();
+    SDL_Texture* loadTexture(const char* fileName);
     void processInput();
     void updateGame();
     void generateOutput();
 
     SDL_Window* p_Window;
     SDL_Renderer* p_Render;
+    std::unordered_map<char*, SDL_Texture*> textureMap;
 };
 
 #endif

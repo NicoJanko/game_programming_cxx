@@ -11,6 +11,7 @@ option(ENABLE_CLANG_TIDY "Run clang-tidy during build" OFF)
 #for sdl
 include(FetchContent)
 
+#for sdl
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
 set(SDL_TEST OFF CACHE BOOL "" FORCE)
@@ -21,8 +22,26 @@ FetchContent_Declare(
     GIT_TAG         release-2.32.10
     GIT_SHALLOW     TRUE
 )
-
 FetchContent_MakeAvailable(SDL2)
+#for sdl_image
+set(SDL2IMAGE_VENDORED OFF CACHE BOOL "" FORCE)   # don't build external image libs
+set(SDL2IMAGE_SAMPLES OFF CACHE BOOL "" FORCE)
+set(SDL2IMAGE_INSTALL OFF CACHE BOOL "" FORCE)
+set(SDL2IMAGE_AVIF OFF CACHE BOOL "" FORCE)       # formats needing extra libraries
+set(SDL2IMAGE_JXL OFF CACHE BOOL "" FORCE)
+set(SDL2IMAGE_TIF OFF CACHE BOOL "" FORCE)
+set(SDL2IMAGE_WEBP OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)    # static, like your SDL
+
+FetchContent_Declare(
+    SDL2_image
+    GIT_REPOSITORY  https://github.com/libsdl-org/SDL_image.git
+    GIT_TAG         release-2.8.12
+    GIT_SHALLOW     TRUE
+)
+FetchContent_MakeAvailable(SDL2_image)
+
+
 
 
 add_executable(starship src/main.cpp
@@ -34,13 +53,20 @@ add_executable(starship src/main.cpp
     src/components/component.h
     src/components/component.cpp
     src/utils.h
+    src/utils.cpp
     )
 target_include_directories(starship PRIVATE src)
+
+target_compile_definitions(starship PRIVATE
+    ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/asset"
+)
+
 target_link_libraries(
     starship
         PRIVATE
             SDL2::SDL2main
             SDL2::SDL2-static
+            SDL2_image::SDL2_image-static
             
 )           
 

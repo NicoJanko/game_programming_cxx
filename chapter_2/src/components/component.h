@@ -7,7 +7,7 @@ class Component {
     Component(class Actor* owner, int updateOrder = 100);
 
     virtual ~Component();
-    virtual void Update(float deltaTime);
+    virtual void Update(const float& deltaTime);
     int getUpdateOrder() const { return updateOrder; }
 
   protected:

@@ -1,6 +1,11 @@
 #include "game.h"
 #include "utils.h"
 #include <algorithm>
+#include <filesystem>
+
+namespace {
+const std::filesystem::path asset_dir{ASSET_DIR};
+}
 
 Game::Game() {}
 
@@ -11,6 +16,12 @@ bool Game::initialize() {
     int sdlResults = SDL_Init(SDL_INIT_VIDEO);
     if (sdlResults != 0) {
         SDL_Log("Failed to initialize sdl with error %s", SDL_GetError());
+        return false;
+    }
+
+    sdlResults = IMG_Init(IMG_INIT_PNG);
+    if (sdlResults != 0) {
+        SDL_Log("Failed to initialize sdl_image with error %s", IMG_GetError());
         return false;
     }
 
@@ -103,3 +114,23 @@ void Game::removeActor(Actor* actor) {
     }
     // throw an error that the actor was not found
 }
+
+SDL_Texture* Game::loadTexture(const char* fileName) {
+    // load from file
+    const std::string full_path = (asset_dir / fileName).string();
+    SDL_Surface* surf = IMG_Load(full_path.c_str()); // need to be char*
+    if (!surf) {
+        SDL_Log("Failed to load texture file %s", fileName);
+        return nullptr;
+    }
+    // create texture from surface
+    SDL_Texture* text = SDL_CreateTextureFromSurface(p_Render, surf);
+    SDL_FreeSurface(surf);
+    if (!text) {
+        SDL_Log("Failed to convert surface to texture for %s", fileName);
+        return nullptr;
+    }
+    return text;
+}
+
+void Game::loadData() { textureMap["Ship01.png"] = loadTexture("Ship01.png"); }
