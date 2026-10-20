@@ -1,4 +1,5 @@
 #include "game.h"
+#include "components/bg_sprite_component.h"
 #include "utils.h"
 #include <algorithm>
 #include <filesystem>
@@ -7,7 +8,13 @@ namespace {
 const std::filesystem::path asset_dir{ASSET_DIR};
 }
 
-Game::Game() {}
+Game::Game() {
+    p_Window = nullptr;
+
+    isRunning = true;
+
+    tickCounts = 0;
+}
 
 Game::~Game() {}
 
@@ -20,7 +27,7 @@ bool Game::initialize() {
     }
 
     sdlResults = IMG_Init(IMG_INIT_PNG);
-    if (sdlResults != 0) {
+    if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) == 0) {
         SDL_Log("Failed to initialize sdl_image with error %s", IMG_GetError());
         return false;
     }
@@ -34,9 +41,9 @@ bool Game::initialize() {
         return false;
     }
 
-    p_Render =
+    p_Renderer =
         SDL_CreateRenderer(p_Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!p_Render) {
+    if (!p_Renderer) {
         SDL_Log("Failed to create renderer with error %s", SDL_GetError());
         return false;
     }
@@ -45,6 +52,9 @@ bool Game::initialize() {
     deltaTime = 0.0f;
     tickCounts = 0;
     updatingActor = false;
+
+    loadData();
+
     return true;
 }
 
@@ -58,11 +68,28 @@ void Game::runLoop() {
 
 void Game::shutdown() {
     SDL_DestroyWindow(p_Window);
-    SDL_DestroyRenderer(p_Render);
+    SDL_DestroyRenderer(p_Renderer);
     SDL_Quit();
 }
 
-void Game::processInput() {}
+void Game::processInput() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+            isRunning = false;
+            break;
+        }
+    }
+
+    const Uint8* state = SDL_GetKeyboardState(NULL);
+    if (state[SDL_SCANCODE_ESCAPE]) {
+        isRunning = false;
+    }
+
+    // Process ship input
+    ship->processKeyboard(state);
+}
 
 void Game::updateGame() {
     utils::waitNextFrame(tickCounts);
@@ -71,7 +98,7 @@ void Game::updateGame() {
     // update actors
     updatingActor = true;
     for (auto* actor : activeActors) {
-        actor->updateActor(deltaTime);
+        actor->update(deltaTime);
     }
     updatingActor = false;
     for (auto* actor : pendingActors) {
@@ -90,7 +117,17 @@ void Game::updateGame() {
     }
 }
 
-void Game::generateOutput() {}
+void Game::generateOutput() {
+    SDL_SetRenderDrawColor(p_Renderer, 0, 0, 0, 255);
+    SDL_RenderClear(p_Renderer);
+
+    // Draw all sprite components
+    for (auto* sprite : sprites) {
+        sprite->draw(p_Renderer);
+    }
+
+    SDL_RenderPresent(p_Renderer);
+}
 
 void Game::addActor(Actor* actor) {
     if (updatingActor) {
@@ -138,7 +175,7 @@ SDL_Texture* Game::loadTexture(const char* fileName) {
         return nullptr;
     }
     // create texture from surface
-    SDL_Texture* text = SDL_CreateTextureFromSurface(p_Render, surf);
+    SDL_Texture* text = SDL_CreateTextureFromSurface(p_Renderer, surf);
     SDL_FreeSurface(surf);
     if (!text) {
         SDL_Log("Failed to convert surface to texture for %s", fileName);
@@ -147,4 +184,34 @@ SDL_Texture* Game::loadTexture(const char* fileName) {
     return text;
 }
 
-void Game::loadData() { textureMap["Ship01.png"] = loadTexture("Ship01.png"); }
+SDL_Texture* Game::getTexture(const char* fileName) {
+    auto iter = textureMap.find(fileName);
+    if (iter != textureMap.end()) {
+        return iter->second;
+    }
+    return nullptr;
+}
+
+void Game::loadData() {
+    // load all textures
+    textureMap["Ship01.png"] = loadTexture("Ship01.png");
+    textureMap["Ship02.png"] = loadTexture("Ship02.png");
+    textureMap["Ship03.png"] = loadTexture("Ship03.png");
+    textureMap["Ship04.png"] = loadTexture("Ship04.png");
+
+    textureMap["Farback01.png"] = loadTexture("Farback01.png");
+    textureMap["Farback02.png"] = loadTexture("Farback02.png");
+
+    // construct actors
+    ship = new ShipActor(this);
+    ship->setPosition(Vector2(100.0f, 384.0f));
+    ship->setScale(1.0f);
+
+    backGround = new Actor(this);
+    backGround->setPosition(Vector2(512.0f, 384.0f));
+    auto* bg = new BGSpriteComponent(backGround, 50);
+    bg->setScreenSize(Vector2(1024.0f, 768.0f));
+    std::vector<SDL_Texture*> bgtex = {getTexture("Farback01.png"), getTexture("Farback02.png")};
+    bg->setBGTextures(bgtex);
+    bg->setScrollSpeed(-200);
+}

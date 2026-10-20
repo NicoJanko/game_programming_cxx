@@ -3,6 +3,7 @@
 
 #include "object/vectors.h"
 #include <SDL.h>
+#include <vector>
 
 class Actor {
   public:
@@ -23,7 +24,9 @@ class Actor {
 
     State getState() const { return state; }
     float getScale() const { return scale; }
+    void setScale(const float scal) { scale = scal; };
     Vector2 getPosition() const { return position; }
+    void setPosition(const Vector2& pos) { position = pos; };
     float getRotation() const { return rotation_r; }
 
   private:
@@ -34,6 +37,7 @@ class Actor {
     float rotation_r;
 
     class Game* game;
+    std::vector<class Component*> components;
 };
 
 #endif

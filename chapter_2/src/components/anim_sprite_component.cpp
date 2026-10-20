@@ -1,7 +1,7 @@
 #include "anim_sprite_component.h"
 
 AnimSpriteComponent::AnimSpriteComponent(class Actor* owner, int drawOrder)
-    : SpriteComponent(owner, drawOrder) {}
+    : SpriteComponent(owner, drawOrder), currFrame(0.0f), animFPS(24.0f) {}
 
 void AnimSpriteComponent::update(const float& deltaTime) {
 

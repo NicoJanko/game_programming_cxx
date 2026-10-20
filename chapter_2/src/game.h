@@ -2,9 +2,12 @@
 #define GAME_H
 
 #include "actors/actor.h"
+#include "actors/ship_actor.h"
+
 #include "components/sprite_component.h"
 #include <SDL.h>
 #include <SDL_image.h>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -22,6 +25,8 @@ class Game {
     void removeActor(Actor* actor);
 
     void addSprite(SpriteComponent* sprite);
+    SDL_Texture* loadTexture(const char* fileName);
+    SDL_Texture* getTexture(const char* fileName);
 
   private:
     float deltaTime;
@@ -32,17 +37,20 @@ class Game {
     std::vector<Actor*> activeActors;
     std::vector<Actor*> pendingActors;
     void loadData();
-    SDL_Texture* loadTexture(const char* fileName);
+
     void processInput();
     void updateGame();
     void generateOutput();
 
     SDL_Window* p_Window;
-    SDL_Renderer* p_Render;
+    SDL_Renderer* p_Renderer;
 
-    std::unordered_map<char*, SDL_Texture*> textureMap;
+    std::unordered_map<std::string, SDL_Texture*> textureMap;
 
     std::vector<SpriteComponent*> sprites;
+
+    ShipActor* ship;
+    Actor* backGround;
 };
 
 #endif
