@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "actors/actor.h"
+#include "components/sprite_component.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <unordered_map>
@@ -20,6 +21,8 @@ class Game {
     void addActor(Actor* actor);
     void removeActor(Actor* actor);
 
+    void addSprite(SpriteComponent* sprite);
+
   private:
     float deltaTime;
     uint32_t tickCounts;
@@ -36,7 +39,10 @@ class Game {
 
     SDL_Window* p_Window;
     SDL_Renderer* p_Render;
+
     std::unordered_map<char*, SDL_Texture*> textureMap;
+
+    std::vector<SpriteComponent*> sprites;
 };
 
 #endif

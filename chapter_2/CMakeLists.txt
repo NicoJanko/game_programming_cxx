@@ -54,6 +54,12 @@ add_executable(starship src/main.cpp
     src/components/component.cpp
     src/utils.h
     src/utils.cpp
+    src/components/sprite_component.h
+    src/components/sprite_component.cpp
+    src/components/anim_sprite_component.h
+    src/components/anim_sprite_component.cpp
+    src/components/bg_sprite_component.h
+    src/components/bg_sprite_component.cpp
     )
 target_include_directories(starship PRIVATE src)
 

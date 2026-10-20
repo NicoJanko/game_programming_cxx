@@ -1,7 +1,8 @@
 #include "component.h"
 
-Component::Component(class Actor* owner, int updateOrder) {}
+Component::Component(class Actor* owner, int updateOrder)
+    : owner(owner), updateOrder(updateOrder) {}
 
 Component::~Component() {}
 
-void Component::Update(const float& deltaTime) {}
+void Component::update(const float& deltaTime) {}

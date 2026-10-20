@@ -115,6 +115,20 @@ void Game::removeActor(Actor* actor) {
     // throw an error that the actor was not found
 }
 
+void Game::addSprite(SpriteComponent* sprite) {
+    // find the insertion point
+    int thisDrawOrder = sprite->getDrawOrder();
+    auto iter = sprites.begin();
+
+    for (; iter != sprites.end(); ++iter) {
+        if (thisDrawOrder < (*iter)->getDrawOrder()) {
+            break;
+        }
+    }
+
+    sprites.insert(iter, sprite);
+}
+
 SDL_Texture* Game::loadTexture(const char* fileName) {
     // load from file
     const std::string full_path = (asset_dir / fileName).string();

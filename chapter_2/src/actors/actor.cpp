@@ -1,10 +1,9 @@
 #include "actor.h"
+#include "game.h"
 
-Actor::Actor(class Game* game) {}
+Actor::Actor(class Game* game) : game(game) { game->addActor(this); }
 
 Actor::~Actor() {}
-
-Actor::State Actor::getState() { return state; }
 
 void Actor::update(const float& deltaTime) {}
 
