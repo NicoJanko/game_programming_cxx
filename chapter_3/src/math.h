@@ -16,7 +16,7 @@ inline float toRadians(float degrees) { return degrees * pi / 180.0f; }
 
 inline float toDegrees(float radians) { return radians * 180.0f / pi; }
 
-inline bool nearZero(float val, float epsilon) { return std::fabs(val) <= epsilon; }
+inline bool nearZero(float val, float epsilon = 0.001f) { return std::fabs(val) <= epsilon; }
 
 } // namespace Math
 

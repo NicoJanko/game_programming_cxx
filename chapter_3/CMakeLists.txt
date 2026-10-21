@@ -62,6 +62,8 @@ add_executable(game src/main.cpp
     src/components/bg_sprite_component.cpp
     src/math.h
     src/math.cpp
+    src/components/move_component.cpp
+    src/components/move_component.h
     )
 target_include_directories(game PRIVATE src)
 
