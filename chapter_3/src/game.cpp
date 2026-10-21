@@ -1,5 +1,6 @@
 #include "game.h"
 #include "actors/actor.h"
+#include "actors/asteroid_actor.h"
 #include "components/bg_sprite_component.h"
 #include "utils.h"
 #include <algorithm>
@@ -89,7 +90,6 @@ void Game::processInput() {
     }
 
     // Process actor input
-    
 }
 
 void Game::updateGame() {
@@ -195,25 +195,18 @@ SDL_Texture* Game::getTexture(const char* fileName) {
 
 void Game::loadData() {
     // load all textures
-    //TODO : use a tile map
-    textureMap["Actor01.png"] = loadTexture("Actor01.png");
-    textureMap["Actor02.png"] = loadTexture("Actor02.png");
-    textureMap["Actor03.png"] = loadTexture("Actor03.png");
-    textureMap["Actor04.png"] = loadTexture("Actor04.png");
 
-    textureMap["Background01.png"] = loadTexture("Background01.png");
-    textureMap["Background02.png"] = loadTexture("Background02.png");
-
-    // construct actors
-    actor = new Actor(this);
-    actor->setPosition(Vector2(100.0f, 384.0f));
-    actor->setScale(1.0f);
-
+    textureMap["Farback01.png"] = loadTexture("Farback01.png");
     backGround = new Actor(this);
     backGround->setPosition(Vector2(512.0f, 384.0f));
     auto* bg = new BGSpriteComponent(backGround, 50);
     bg->setScreenSize(Vector2(1024.0f, 768.0f));
-    std::vector<SDL_Texture*> bgtex = {getTexture("Background01.png"), getTexture("Background02.png")};
+    std::vector<SDL_Texture*> bgtex = {getTexture("Farback01.png")};
     bg->setBGTextures(bgtex);
-    bg->setScrollSpeed(-200);
+
+    // TODO : use a tile map
+    const int numAsteroid = 20;
+    for (int i = 0; i < numAsteroid; i++) {
+        new AsteroidActor(this);
+    }
 }

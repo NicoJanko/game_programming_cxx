@@ -1,8 +1,8 @@
 #include "sprite_component.h"
 #include "actors/actor.h"
 #include "game.h"
+#include "math.h"
 #include "utils.h"
-#include <cmath>
 
 SpriteComponent::SpriteComponent(class Actor* owner, int drawOrder)
     : Component(owner), drawOrder(drawOrder) {
@@ -21,7 +21,7 @@ void SpriteComponent::draw(SDL_Renderer* renderer) {
         r.x = static_cast<int>(owner->getPosition().x - (r.w / 2));
         r.y = static_cast<int>(owner->getPosition().y - (r.h / 2));
 
-        SDL_RenderCopyEx(renderer, texture, nullptr, &r, math::toDegrees(owner->getRotation()),
+        SDL_RenderCopyEx(renderer, texture, nullptr, &r, Math::toDegrees(owner->getRotation()),
                          nullptr, SDL_FLIP_NONE);
     }
 }

@@ -1,7 +1,6 @@
 #ifndef COMPONENTS_BG_SPRITE_H
 #define COMPONENTS_BG_SPRITE_H
 
-#include "object/vectors.h"
 #include "sprite_component.h"
 #include <SDL.h>
 #include <vector>

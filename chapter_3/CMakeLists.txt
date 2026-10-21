@@ -49,7 +49,6 @@ add_executable(game src/main.cpp
     src/game.h
     src/actors/actor.cpp
     src/actors/actor.h
-    src/object/vectors.h
     src/components/component.h
     src/components/component.cpp
     src/utils.h
@@ -64,6 +63,8 @@ add_executable(game src/main.cpp
     src/math.cpp
     src/components/move_component.cpp
     src/components/move_component.h
+    src/actors/asteroid_actor.h
+    src/actors/asteroid_actor.cpp
     )
 target_include_directories(game PRIVATE src)
 
