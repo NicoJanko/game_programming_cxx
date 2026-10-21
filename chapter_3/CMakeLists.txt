@@ -65,6 +65,14 @@ add_executable(game src/main.cpp
     src/components/move_component.h
     src/actors/asteroid_actor.h
     src/actors/asteroid_actor.cpp
+    src/components/input_component.cpp
+    src/components/input_component.h
+    src/actors/ship_actor.cpp
+    src/actors/ship_actor.h
+    src/components/circle_component.cpp
+    src/components/circle_component.h
+    src/actors/lazer_actor.cpp
+    src/actors/lazer_actor.h
     )
 target_include_directories(game PRIVATE src)
 

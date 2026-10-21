@@ -49,3 +49,15 @@ void Actor::removeComponent(class Component* component) {
         components.erase(iter);
     }
 }
+
+void Actor::processInput(const uint8_t* keyState) {
+    // first process inputs for components
+    if (state == Active) {
+        for (auto* comp : components) {
+            comp->processInput(keyState);
+        }
+        actorInput(keyState);
+    }
+}
+
+void Actor::actorInput(const uint8_t* keyState) {}

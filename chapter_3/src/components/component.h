@@ -11,6 +11,8 @@ class Component {
     virtual void update(const float& deltaTime);
     int getUpdateOrder() const { return updateOrder; }
 
+    virtual void processInput(const uint8_t* keyState) {}
+
   protected:
     class Actor* owner;
     int updateOrder;

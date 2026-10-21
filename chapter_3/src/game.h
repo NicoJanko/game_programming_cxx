@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "actors/actor.h"
+#include "actors/asteroid_actor.h"
 
 #include "components/sprite_component.h"
 #include <SDL.h>
@@ -24,8 +25,12 @@ class Game {
     void removeActor(Actor* actor);
 
     void addSprite(SpriteComponent* sprite);
+    void removeSprite(SpriteComponent* sprite);
     SDL_Texture* loadTexture(const char* fileName);
     SDL_Texture* getTexture(const char* fileName);
+
+    const std::vector<AsteroidActor*>& getAsteroidActors() const { return asteroidActors; }
+    void removeAsteroid(AsteroidActor* ast);
 
   private:
     float deltaTime;
@@ -50,6 +55,8 @@ class Game {
 
     Actor* actor;
     Actor* backGround;
+
+    std::vector<AsteroidActor*> asteroidActors;
 };
 
 #endif

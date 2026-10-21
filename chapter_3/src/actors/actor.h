@@ -24,6 +24,7 @@ class Actor {
     void removeComponent(class Component* component);
 
     State getState() const { return state; }
+    void setState(State stat) { state = stat; }
     float getScale() const { return scale; }
     void setScale(const float scal) { scale = scal; };
     Vector2 getPosition() const { return position; }
@@ -34,6 +35,9 @@ class Actor {
         return Vector2(std::cos(rotation_r), -std::sin(rotation_r));
     }
 
+    void processInput(const uint8_t* keyState);
+    virtual void actorInput(const uint8_t* keyState);
+
   private:
     State state;
 
@@ -41,8 +45,10 @@ class Actor {
     float scale;
     float rotation_r;
 
-    class Game* game;
     std::vector<class Component*> components;
+
+  protected:
+    class Game* game;
 };
 
 #endif

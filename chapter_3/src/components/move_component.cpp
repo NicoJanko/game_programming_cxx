@@ -2,9 +2,7 @@
 #include "actors/actor.h"
 
 MoveComponent::MoveComponent(class Actor* owner, int updateOrder)
-    : Component(owner, updateOrder), angularSpeed(0.0f), forwardSpeed(0.0f) {
-    owner->addComponent(this);
-}
+    : Component(owner, updateOrder), angularSpeed(0.0f), forwardSpeed(0.0f) {}
 
 void MoveComponent::update(const float& deltaTime) {
     if (!Math::nearZero(angularSpeed)) {

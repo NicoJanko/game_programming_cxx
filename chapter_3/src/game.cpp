@@ -1,6 +1,7 @@
 #include "game.h"
 #include "actors/actor.h"
 #include "actors/asteroid_actor.h"
+#include "actors/ship_actor.h"
 #include "components/bg_sprite_component.h"
 #include "utils.h"
 #include <algorithm>
@@ -90,6 +91,11 @@ void Game::processInput() {
     }
 
     // Process actor input
+    updatingActor = true;
+    for (auto* act : activeActors) {
+        act->processInput(state);
+    }
+    updatingActor = false;
 }
 
 void Game::updateGame() {
@@ -102,6 +108,7 @@ void Game::updateGame() {
         actor->update(deltaTime);
     }
     updatingActor = false;
+
     for (auto* actor : pendingActors) {
         activeActors.emplace_back(actor);
     }
@@ -167,6 +174,13 @@ void Game::addSprite(SpriteComponent* sprite) {
     sprites.insert(iter, sprite);
 }
 
+void Game::removeSprite(SpriteComponent* sprite) {
+    auto iter = std::ranges::find(sprites, sprite);
+    if (iter != sprites.end()) {
+        sprites.erase(iter);
+    }
+}
+
 SDL_Texture* Game::loadTexture(const char* fileName) {
     // load from file
     const std::string full_path = (asset_dir / fileName).string();
@@ -197,6 +211,9 @@ void Game::loadData() {
     // load all textures
 
     textureMap["Farback01.png"] = loadTexture("Farback01.png");
+    textureMap["Asteroid.png"] = loadTexture("Asteroid.png");
+    textureMap["Ship.png"] = loadTexture("Ship.png");
+    textureMap["Laser.png"] = loadTexture("Laser.png");
     backGround = new Actor(this);
     backGround->setPosition(Vector2(512.0f, 384.0f));
     auto* bg = new BGSpriteComponent(backGround, 50);
@@ -207,6 +224,10 @@ void Game::loadData() {
     // TODO : use a tile map
     const int numAsteroid = 20;
     for (int i = 0; i < numAsteroid; i++) {
-        new AsteroidActor(this);
+        asteroidActors.emplace_back(new AsteroidActor(this));
     }
+
+    ShipActor* ship = new ShipActor(this);
 }
+
+void Game::removeAsteroid(AsteroidActor* ast) { std::erase(asteroidActors, ast); }

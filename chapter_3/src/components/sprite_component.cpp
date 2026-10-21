@@ -9,7 +9,7 @@ SpriteComponent::SpriteComponent(class Actor* owner, int drawOrder)
     owner->getGame()->addSprite(this);
 }
 
-SpriteComponent::~SpriteComponent() {}
+SpriteComponent::~SpriteComponent() { owner->getGame()->removeSprite(this); }
 
 void SpriteComponent::draw(SDL_Renderer* renderer) {
     if (texture) {
@@ -21,7 +21,7 @@ void SpriteComponent::draw(SDL_Renderer* renderer) {
         r.x = static_cast<int>(owner->getPosition().x - (r.w / 2));
         r.y = static_cast<int>(owner->getPosition().y - (r.h / 2));
 
-        SDL_RenderCopyEx(renderer, texture, nullptr, &r, Math::toDegrees(owner->getRotation()),
+        SDL_RenderCopyEx(renderer, texture, nullptr, &r, -Math::toDegrees(owner->getRotation()),
                          nullptr, SDL_FLIP_NONE);
     }
 }
